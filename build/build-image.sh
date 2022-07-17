@@ -50,7 +50,7 @@ PIHOMEDIR="/home/pi"
 BINDIR="$PIHOMEDIR/$GITHUBPROJECT"
 USER="pi"
 
-MOUNTFAT32="/mnt/fat32"
+MOUNTFAT32="/mnt/ext4/boot"
 MOUNTEXT4="/mnt/ext4"
 
 #####################################################################
@@ -134,7 +134,7 @@ execute "kpartx -a -v -s $OUTFILE"
 
 # Mount partitions
 execute "sudo mount /dev/mapper/loop0p2 $MOUNTEXT4"
-execute "sudo mount /dev/mapper/loop0p1 $MOUNTEXT4/boot"
+execute "sudo mount /dev/mapper/loop0p1 $MOUNTFAT32"
 
 # If mounted, copy current Circuit-Sword repo instead of cloning master
 if [ -d /cs ]; then

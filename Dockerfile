@@ -1,4 +1,4 @@
-FROM debian:buster AS base
+FROM debian:bullseye AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -10,7 +10,6 @@ RUN apt-get clean && apt-get update && \
     vim wget kpartx rsync sudo util-linux cloud-guest-utils
 
 RUN mkdir /build
-RUN mkdir -p /mnt/fat32
 RUN mkdir -p /mnt/ext4
 
 WORKDIR /build
@@ -19,11 +18,11 @@ CMD ["bash"]
 
 
 # Extend image for WiFree Copter
-FROM base AS build-image-wifree
+FROM base AS build-image
 VOLUME /build/images
 
 COPY build/build-image.sh .
 COPY install.sh /
-COPY . /root/
+COPY fs /root/
 
 CMD ["bash"]

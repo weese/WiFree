@@ -45,12 +45,6 @@ else
   DEST=""
 fi
 
-if [[ $5 != "" ]] ; then
-  BOARD=$5
-else
-  BOARD="cs"
-fi
-
 GITHUBPROJECT="wifree-copter"
 GITHUBURL="https://github.com/weese/$GITHUBPROJECT"
 PIHOMEDIR="$DEST/home/pi"
@@ -168,93 +162,11 @@ fi
 execute "chown -R $USER:$USER $BINDIR"
 
 #####################################################################
-# Copy required to /boot
-
-# Config.txt bits
-if ! exists "$DESTBOOT/config_ORIGINAL.txt" ; then
-  execute "cp $DESTBOOT/config.txt $DESTBOOT/config_ORIGINAL.txt"
-  execute "cp $BINDIR/settings/boot-$BOARD/* $DESTBOOT/"
-fi
-
-# Special case where config.txt has been updated on upgrade
-if [[ ! $(grep "CS CONFIG VERSION: 1.0" "$DESTBOOT/config.txt") ]] ; then
-  execute "cp $BINDIR/settings/boot-$BOARD/config.txt $DESTBOOT/config.txt"
-fi
-
-#####################################################################
-# Copy required to /
-
-# Copy autostart
-if ! exists "$DEST/opt/retropie/configs/all/autostart_ORIGINAL.sh" ; then
-  execute "mv $DEST/opt/retropie/configs/all/autostart.sh $DEST/opt/retropie/configs/all/autostart_ORIGINAL.sh"
-  execute "cp $BINDIR/settings/splashscreen.list $DEST/etc/splashscreen.list"
-fi
-execute "cp $BINDIR/settings/autostart-$BOARD.sh $DEST/opt/retropie/configs/all/autostart.sh"
-execute "chown $USER:$USER $DEST/opt/retropie/configs/all/autostart.sh"
-
-
-
-# Install the reboot to hdmi scripts
-execute "cp $BINDIR/settings/reboot_to_hdmi.sh $PIHOMEDIR/RetroPie/retropiemenu/reboot_to_hdmi.sh"
-execute "cp -p $BINDIR/settings/reboot_to_hdmi.png $PIHOMEDIR/RetroPie/retropiemenu/icons/reboot_to_hdmi.png"
-if [[ ! $(grep "reboot_to_hdmi" "$DEST/opt/retropie/configs/all/emulationstation/gamelists/retropie/gamelist.xml") ]] ; then
-  execute "sed -i 's|</gameList>|  <game>\n    <path>./reboot_to_hdmi.sh</path>\n    <name>One Time Reboot to HDMI</name>\n    <desc>Enable HDMI and automatically reboot for it to apply. The subsequent power cycle will revert back to the internal screen. It is normal when enabled for the internal screen to remain grey/white.</desc>\n    <image>/home/pi/RetroPie/retropiemenu/icons/reboot_to_hdmi.png</image>\n  </game>\n</gameList>|g' $DEST/opt/retropie/configs/all/emulationstation/gamelists/retropie/gamelist.xml"
-fi
-
-# Enable 30sec autosave
-execute "sed -i \"s/# autosave_interval =/autosave_interval = \"30\"/\" $DEST/opt/retropie/configs/all/retroarch.cfg"
-
-# Disable 'wait for network' on boot
-execute "rm -f $DEST/etc/systemd/system/dhcpcd.service.d/wait.conf"
-
-# Remove wifi country disabler
-execute "rm -f $DEST/etc/systemd/system/multi-user.target.wants/wifi-country.service"
-
-# Copy wifi firmware
-execute "mkdir -p $DEST/lib/firmware/rtlwifi/"
-execute "cp $BINDIR/wifi-firmware/rtl* $DEST/lib/firmware/rtlwifi/"
-
-# Copy bluetooth firmware
-execute "mkdir -p $DEST/lib/firmware/rtl_bt/"
-execute "cp $BINDIR/bt-driver/rtlbt_* $DEST/lib/firmware/rtl_bt/"
-
-# Remove console=serial0 from cmdline to make UART-based bluetooth module work
-execute "sed -i 's/console=serial0,115200//' $DESTBOOT/cmdline.txt"
-
-# Fix long delay of boot because looking for wrong serial port
-execute "sed -i \"s/dev-serial1.device/dev-ttyAMA0.device/\" $DEST/lib/systemd/system/hciuart.service"
-
-# Install python-serial
-install "settings/deb/python-serial_2.6-1.1_all.deb"
+# Copy all files
+execute "rsync -av $BINDIR/fs/ $DEST/"
 
 # Install rfkill
 install "settings/deb/rfkill_0.5-1_armhf.deb"
-
-# Install avrdude
-# !! The following will work only with hosts that are ARM based, e.g. Macbook M1 or RaspberryPi
-# Avrdude or something connected is causing kernel panics with the latest RetroPie 4.8 if not installed but only extracted :/
-install "settings/deb/libftdi1_0.20-4_armhf.deb"
-install "settings/deb/libhidapi-libusb0_0.8.0~rc1+git20140818.d17db57+dfsg-2_armhf.deb"
-install "settings/deb/avrdude_6.3-20171130+svn1429-2+rpt1_armhf.deb"
-
-# Install DKMS dependencies
-install "settings/deb/libapr1_1.6.5-1_armhf.deb"
-install "settings/deb/libaprutil1_1.6.1-4_armhf.deb"
-install "settings/deb/libserf-1-1_1.3.9-7_armhf.deb"
-install "settings/deb/libutf8proc2_2.3.0-1_armhf.deb"
-install "settings/deb/libsvn1_1.10.4-1+deb10u3_armhf.deb"
-install "settings/deb/subversion_1.10.4-1+deb10u3_armhf.deb"
-
-# Installing the deb modules means to compile for all installed kernels, which takes ages, so we only add the DKMS modules
-# post-install "sound-module/snd-usb-audio-dkms_0.1_armhf.deb"
-# post-install "wifi-module/rtl8723bs-dkms_4.14_all.deb"
-execute "dpkg -x $BINDIR/sound-module/snd-usb-audio-dkms_0.1_armhf.deb $DEST"
-execute "dpkg -x $BINDIR/wifi-module/rtl8723bs-dkms_4.14_all.deb $DEST"
-post-execute "dkms add -m snd-usb-audio -v 0.1"
-post-execute "dkms add -m rtl8723bs -v 4.14"
-
-# Install wiringPi
-install "settings/deb/wiringpi_2.46_armhf.deb"
 
 # Enable /ramdisk as a tmpfs (ramdisk)
 if [[ $(grep '/ramdisk' $DEST/etc/fstab) == "" ]] ; then
@@ -267,37 +179,10 @@ else
   SYSTEMD="$DEST/lib/systemd/system"
 fi
 
-if [ "$BOARD" == "cs" ]; then
-  # Remove the old service
-  execute "rm -f $DEST/etc/systemd/system/cs-osd.service"
-  execute "rm -f $DEST/etc/systemd/system/multi-user.target.wants/cs-osd.service"
-  execute "rm -f $SYSTEMD/cs-osd.service"
+#execute "systemctl enable wifree.service"
+execute "ln -s $SYSTEMD/wifree.service $DEST/etc/systemd/system/wifree.service"
+execute "ln -s $SYSTEMD/wifree.service $DEST/etc/systemd/system/multi-user.target.wants/wifree.service"
 
-  # Install HUD service
-  HUD=cs-osd
-  execute "cp $BINDIR/hud/cs/cs-hud.service $SYSTEMD/$HUD.service"
-else
-  # Install OSD service
-  HUD=saio-osd
-  # execute "cp $BINDIR/hud/saio/saio-osd.service $SYSTEMD/$HUD.service"
-  install "settings/deb/libpng12-0_1.2.54-6_armhf.deb"
-fi
-
-# Prepare for service install
-execute "rm -f $DEST/etc/systemd/system/$HUD.service"
-execute "rm -f $DEST/etc/systemd/system/multi-user.target.wants/$HUD.service"
-
-# Install RTL Bluetooth service
-execute "cp $BINDIR/bt-driver/rtl-bluetooth.service $DEST/lib/systemd/system/rtl-bluetooth.service"
-execute "cp $BINDIR/bt-driver/rtk_hciattach $DEST/usr/bin/rtk_hciattach"
-
-#execute "systemctl enable cs-hud.service"
-execute "ln -s $SYSTEMD/$HUD.service $DEST/etc/systemd/system/$HUD.service"
-execute "ln -s $SYSTEMD/$HUD.service $DEST/etc/systemd/system/multi-user.target.wants/$HUD.service"
-
-#execute "systemctl enable rtl-bluetooth.service"
-execute "ln -s $DEST/lib/systemd/system/rtl-bluetooth.service $DEST/etc/systemd/system/rtl-bluetooth.service"
-execute "ln -s $DEST/lib/systemd/system/rtl-bluetooth.service $DEST/etc/systemd/system/multi-user.target.wants/rtl-bluetooth.service"
 
 if [[ $DEST == "" ]] ; then
   execute "systemctl daemon-reload"

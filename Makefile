@@ -17,21 +17,21 @@ docker-build db: docker-build-kernel docker-build-image
 docker-build-image dbi:
 	DOCKER_BUILDKIT=1 \
 		docker build --progress=plain \
-		--target build-image-wifree \
-		-t build-image \
-		..
+		--target build-image \
+		-t build-image-wifree \
+		.
 
 images/${IMG}.img:
 	mkdir -p images
 	cd images; \
-	wget ${IMG_URL}; \
+	curl ${IMG_URL} -o ${IMG}.img.xz; \
 	xz -d ${IMG}.img.xz
 
 .PHONY: build-image bi
-build-image bi: images/${IMG}_${FLAVOR}.img
+build-image bi: images/${IMG}.img
 	docker run --rm \
 		--name build-image-wifree \
 		--volume ${PWD}/images:/build/images \
 		--privileged \
-		build-image \
-		/bin/bash -c "./build-image.sh YES /build/images/${IMG}_${BRANCH}.img && mv ${IMG}_* /build/images/"
+		build-image-wifree \
+		/bin/bash -c "./build-image.sh YES /build/images/${IMG}.img && mv ${IMG}_* /build/images/"
