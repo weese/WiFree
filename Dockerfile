@@ -23,6 +23,7 @@ VOLUME /build/images
 
 COPY build/build-image.sh .
 COPY install.sh /
-COPY fs /root/
+RUN mkdir -p /home/pi/WiFree
+COPY . /home/pi/Wifree
 
 CMD ["bash"]

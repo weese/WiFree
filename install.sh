@@ -45,7 +45,7 @@ else
   DEST=""
 fi
 
-GITHUBPROJECT="wifree-copter"
+GITHUBPROJECT="WiFree"
 GITHUBURL="https://github.com/weese/$GITHUBPROJECT"
 PIHOMEDIR="$DEST/home/pi"
 BINDIR="$PIHOMEDIR/$GITHUBPROJECT"
@@ -164,6 +164,9 @@ execute "chown -R $USER:$USER $BINDIR"
 #####################################################################
 # Copy all files
 execute "rsync -av $BINDIR/fs/ $DEST/"
+
+# Copy all files
+execute "touch $DESTBOOT/ssh"
 
 # Install rfkill
 install "settings/deb/rfkill_0.5-1_armhf.deb"
