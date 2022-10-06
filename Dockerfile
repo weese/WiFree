@@ -41,9 +41,7 @@ CMD ["bash"]
 FROM base AS build-image
 VOLUME /images
 
-COPY build/* .
-COPY install.sh /
-RUN mkdir -p /home/pi/WiFree
-COPY . /home/pi/Wifree
+COPY . /build
+WORKDIR /build/build
 
 CMD ["bash"]

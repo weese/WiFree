@@ -47,8 +47,7 @@ fi
 
 GITHUBPROJECT="WiFree"
 GITHUBURL="https://github.com/weese/$GITHUBPROJECT"
-PIHOMEDIR="$DEST/home/pi"
-BINDIR="$PIHOMEDIR/$GITHUBPROJECT"
+REPODIR="/build"
 # USER="pi"
 USER=1000
 POSTINSTALL="/usr/local/sbin/post-install.sh"
@@ -155,21 +154,10 @@ exists() { #FILE
 # LOGIC!
 echo "INSTALLING.."
 
-# Checkout code if not already done so
-if ! exists "$BINDIR/LICENSE" ; then
-  execute "git clone --recursive --depth 1 --branch $BRANCH $GITHUBURL $BINDIR"
-fi
-execute "chown -R $USER:$USER $BINDIR"
-
 #####################################################################
 # Copy all files
-execute "rsync -av $BINDIR/fs/ $DEST/"
-
-# Copy all files
+execute "rsync -av $REPODIR/fs/ $DEST/"
 execute "touch $DESTBOOT/ssh"
-
-# Install rfkill
-install "settings/deb/rfkill_0.5-1_armhf.deb"
 
 # Enable /ramdisk as a tmpfs (ramdisk)
 if [[ $(grep '/ramdisk' $DEST/etc/fstab) == "" ]] ; then
@@ -189,10 +177,9 @@ fi
 execute "ln -s $SYSTEMD/wifree.service $DEST/etc/systemd/system/wifree.service"
 execute "ln -s $SYSTEMD/wifree.service $DEST/etc/systemd/system/multi-user.target.wants/wifree.service"
 
-
 if [[ $DEST == "" ]] ; then
   execute "systemctl daemon-reload"
-  execute "systemctl start $HUD.service"
+  execute "systemctl start wifree.service"
 fi
 
 #####################################################################
