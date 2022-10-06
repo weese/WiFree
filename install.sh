@@ -176,6 +176,9 @@ if [[ $(grep '/ramdisk' $DEST/etc/fstab) == "" ]] ; then
   execute "echo 'tmpfs    /ramdisk    tmpfs    defaults,noatime,nosuid,size=100k    0 0' >> $DEST/etc/fstab"
 fi
 
+# Remove console=serial0 from cmdline to make UART-based bluetooth module work
+execute "sed -i 's/console=serial0,115200//' $DESTBOOT/cmdline.txt"
+
 if [ -d $DEST/usr/lib/systemd/system ]; then
   SYSTEMD="$DEST/usr/lib/systemd/system"
 else
