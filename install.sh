@@ -156,31 +156,41 @@ echo "INSTALLING.."
 
 #####################################################################
 # Copy all files
-execute "rsync -av $REPODIR/fs/ $DEST/"
-execute "touch $DESTBOOT/ssh"
+execute "rsync -av --exclude=.* $REPODIR/fs/ $DEST/"
+# execute "touch $DESTBOOT/ssh"
 
 # Enable /ramdisk as a tmpfs (ramdisk)
-if [[ $(grep '/ramdisk' $DEST/etc/fstab) == "" ]] ; then
-  execute "echo 'tmpfs    /ramdisk    tmpfs    defaults,noatime,nosuid,size=100k    0 0' >> $DEST/etc/fstab"
-fi
+# if [[ $(grep '/ramdisk' $DEST/etc/fstab) == "" ]] ; then
+#   execute "echo 'tmpfs    /ramdisk    tmpfs    defaults,noatime,nosuid,size=100k    0 0' >> $DEST/etc/fstab"
+# fi
 
-# Remove console=serial0 from cmdline to make UART-based bluetooth module work
-execute "sed -i 's/console=serial0,115200//' $DESTBOOT/cmdline.txt"
+# execute "ln -sv $DEST/etc/systemd/system/create_ap.service $DEST/etc/systemd/system/multi-user.target.wants/create_ap.service"
+# execute "ln -sv $DEST/etc/systemd/system/wifree.service $DEST/etc/systemd/system/multi-user.target.wants/wifree.service"
+execute "sudo chroot $DEST systemctl enable wifree.service"
+execute "sudo chroot $DEST systemctl enable create_ap.service"
+execute "sudo chroot $DEST apt install -y ruby:armhf hostapd:armhf"
 
-if [ -d $DEST/usr/lib/systemd/system ]; then
-  SYSTEMD="$DEST/usr/lib/systemd/system"
-else
-  SYSTEMD="$DEST/lib/systemd/system"
-fi
+# boot config
+cat << EOF >> $DESTBOOT/config.txt
+start_x=1
+enable_uart=1
+dtoverlay=disable-bt
+dtoverlay=pi3-disable-bt
+dtoverlay=miniuart-bt
 
-#execute "systemctl enable wifree.service"
-execute "ln -s $SYSTEMD/wifree.service $DEST/etc/systemd/system/wifree.service"
-execute "ln -s $SYSTEMD/wifree.service $DEST/etc/systemd/system/multi-user.target.wants/wifree.service"
+hdmi_cvt=1024 600 60 3 0 0 0
+hdmi_group=2
+hdmi_mode=87
+hdmi_drive=2
+EOF
 
 if [[ $DEST == "" ]] ; then
   execute "systemctl daemon-reload"
   execute "systemctl start wifree.service"
 fi
+
+# disable terminal on serial
+sed -i 's/console=serial0,115200//' "$DESTBOOT/cmdline.txt"
 
 #####################################################################
 # DONE

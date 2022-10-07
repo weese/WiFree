@@ -20,10 +20,10 @@ docker-build-kernel:
 		docker build \
 		--file ${DOCKERFILE} \
 		--progress=plain \
-		--build-arg TARGET=${TARGET} \
+		--build-arg KERNEL=${KERNEL} \
 		--build-arg BRANCH=${BRANCH} \
 		--target build-kernel \
-		-t build-${TARGET}-${BRANCH} \
+		-t build-${KERNEL}-${BRANCH} \
 		.
 
 .PHONY: docker-build-image
@@ -48,7 +48,7 @@ build-kernel bk images/${IMG}_${BRANCH}.img: images/${IMG}.img
 		--name build-kernel \
 		--volume ${PWD}/images:/images \
 		--privileged \
-		build-${TARGET}-${BRANCH} \
+		build-${KERNEL}-${BRANCH} \
 		/bin/bash -c "KERNEL=${KERNEL} ./build-kernel.sh YES /images/${IMG}.img && mv ${IMG}_kernel.img /images/${IMG}_${BRANCH}.img"
 
 .PHONY: build-image bi

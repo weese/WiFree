@@ -3,10 +3,10 @@
 set -e
 
 if [[ $1 != "" ]] ; then
-  TARGET="$1"
+  KERNEL="$1"
   shift
 else
-  TARGET="cm3"
+  KERNEL="kernel"
 fi
 
 if [[ $1 != "" ]] ; then
@@ -56,9 +56,9 @@ echo "COMPILING.."
 execute "cd linux"
 
 # Use default conf with RTL8723BS enabled
-if [ "${TARGET}" == "kernel7l" || "${TARGET}" == "kernel8"] ; then
+if [ "${KERNEL}" == "kernel7l" || "${KERNEL}" == "kernel8"] ; then
   execute "make $MAKE_FLAGS bcm2711_defconfig"
-elif [ "${TARGET}" == "linux7" ] ; then
+elif [ "${KERNEL}" == "linux7" ] ; then
   execute "make $MAKE_FLAGS bcm2709_defconfig"
 else
   execute "make $MAKE_FLAGS bcmrpi_defconfig"

@@ -94,20 +94,20 @@ fi
 execute "cp $IMG $OUTFILE"
 
 # Increase image to hold our extras
-execute "truncate --size=+256M $OUTFILE"
+# execute "truncate --size=+256M $OUTFILE"
 
 # Find partions using kpartx
 execute "kpartx -d /dev/loop0 || true"
 execute "losetup -d /dev/loop0 || true"
 execute "kpartx -a -v -s $OUTFILE"
 
-# Resize fs
-execute "growpart /dev/loop0 2"
-execute "kpartx -d /dev/loop0 || true"
-execute "losetup -d /dev/loop0 || true"
-execute "kpartx -a -v -s $OUTFILE"
-execute "e2fsck -y -f /dev/mapper/loop0p2"
-execute "resize2fs /dev/mapper/loop0p2"
+# # Resize fs
+# execute "growpart /dev/loop0 2"
+# execute "kpartx -d /dev/loop0 || true"
+# execute "losetup -d /dev/loop0 || true"
+# execute "kpartx -a -v -s $OUTFILE"
+# execute "e2fsck -y -f /dev/mapper/loop0p2"
+# execute "resize2fs /dev/mapper/loop0p2"
 
 # Mount partitions
 execute "sudo mount /dev/mapper/loop0p1 $MOUNTFAT32"

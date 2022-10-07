@@ -136,11 +136,6 @@ execute "kpartx -a -v -s $OUTFILE"
 execute "sudo mount /dev/mapper/loop0p2 $MOUNTEXT4"
 execute "sudo mount /dev/mapper/loop0p1 $MOUNTFAT32"
 
-# If mounted, copy current Circuit-Sword repo instead of cloning master
-if [ -d /cs ]; then
-  execute "cp -a /cs $MOUNTEXT4$BINDIR"
-fi
-
 # Install
 execute "../install.sh YES $BRANCH $MOUNTFAT32 $MOUNTEXT4"
 
