@@ -166,9 +166,18 @@ execute "rsync -av --exclude=.* $REPODIR/fs/ $DEST/"
 
 # execute "ln -sv $DEST/etc/systemd/system/create_ap.service $DEST/etc/systemd/system/multi-user.target.wants/create_ap.service"
 # execute "ln -sv $DEST/etc/systemd/system/wifree.service $DEST/etc/systemd/system/multi-user.target.wants/wifree.service"
-execute "sudo chroot $DEST systemctl enable wifree.service"
-execute "sudo chroot $DEST systemctl enable create_ap.service"
-execute "sudo chroot $DEST apt install -y ruby:armhf hostapd:armhf"
+execute "chroot $DEST systemctl enable wifree.service"
+execute "chroot $DEST systemctl enable create_ap.service"
+
+execute "chroot $DEST apt-get clean"
+execute "chroot $DEST apt-get update"
+execute "chroot $DEST apt-get install -y \
+  hostapd:armhf dnsmasq:armhf \
+  hostapd:armhf iptables:armhf \
+  ruby:armhf ruby-serialport:armhf minicom:armhf \
+  python3-picamera:armhf \
+  gstreamer1.0-x:armhf gstreamer1.0-omx:armhf gstreamer1.0-plugins-base:armhf \
+  gstreamer1.0-plugins-good:armhf  gstreamer1.0-plugins-bad:armhf gstreamer1.0-plugins-ugly:armhf"
 
 # boot config
 cat << EOF >> $DESTBOOT/config.txt
@@ -190,7 +199,7 @@ if [[ $DEST == "" ]] ; then
 fi
 
 # disable terminal on serial
-sed -i 's/console=serial0,115200//' "$DESTBOOT/cmdline.txt"
+execute "sed -i 's/console=serial0,115200//' $DESTBOOT/cmdline.txt"
 
 #####################################################################
 # DONE

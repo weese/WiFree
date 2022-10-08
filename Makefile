@@ -1,9 +1,20 @@
 BOARD?=cs
 
-# Latest
-IMG=raspios-bullseye-armhf-lite
-IMG_URL=https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-09-26/2022-09-22-raspios-bullseye-armhf-lite.img.xz
-BRANCH=rpi-5.19.y
+# # Latest (Debian 11 Bullseye)
+# IMG=raspios-bullseye-armhf-lite
+# IMG_URL=https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-09-26/2022-09-22-raspios-bullseye-armhf-lite.img.xz
+# BRANCH=rpi-5.19.y
+
+# # Legacy (Debian 10 Buster)
+# IMG=raspios-buster-armhf-lite
+# IMG_URL=https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-09-26/2022-09-22-raspios-buster-armhf-lite.img.xz
+# BRANCH=rpi-5.19.y
+
+# Old Legacy (Debian 9 Stretch) uses kernel 4.x which supports signal strength monitoring in AP mode for the onboard wifi
+IMG=raspios-stretch-armhf-lite
+IMG_URL=https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/2019-04-08-raspbian-stretch-lite.zip
+BRANCH=rpi-4.14.y
+
 KERNEL=kernel
 DOCKERFILE=Dockerfile
 
@@ -36,11 +47,17 @@ docker-build-image dbi:
 		-t build-image-wifree \
 		.
 
+# images/${IMG}.img:
+# 	mkdir -p images
+# 	cd images; \
+# 	curl ${IMG_URL} -o ${IMG}.img.xz; \
+# 	xz -d ${IMG}.img.xz
+
 images/${IMG}.img:
 	mkdir -p images
-	cd images; \
-	curl ${IMG_URL} -o ${IMG}.img.xz; \
-	xz -d ${IMG}.img.xz
+	curl ${IMG_URL} -o images/${IMG}.img.zip
+	unzip -p images/${IMG}.img.zip > $@
+	rm images/${IMG}.img.zip
 
 .PHONY: build-kernel bk
 build-kernel bk images/${IMG}_${BRANCH}.img: images/${IMG}.img
@@ -52,10 +69,10 @@ build-kernel bk images/${IMG}_${BRANCH}.img: images/${IMG}.img
 		/bin/bash -c "KERNEL=${KERNEL} ./build-kernel.sh YES /images/${IMG}.img && mv ${IMG}_kernel.img /images/${IMG}_${BRANCH}.img"
 
 .PHONY: build-image bi
-build-image bi: images/${IMG}_${BRANCH}.img
+build-image bi: images/${IMG}.img
 	docker run --rm \
 		--name build-image-wifree \
 		--volume ${PWD}/images:/images \
 		--privileged \
 		build-image-wifree \
-		/bin/bash -c "./build-image.sh YES /images/${IMG}_${BRANCH}.img ${BOARD} && mv ${IMG}_* /images/"
+		/bin/bash -c "./build-image.sh YES /images/${IMG}.img ${BOARD} && mv ${IMG}_* /images/"
