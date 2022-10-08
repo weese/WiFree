@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStartPre=/root/WiFree/create_partition.sh &>/dev/null
-ExecStartPre=stty -F /dev/ttyAMA0 115200
+ExecStartPre=/bin/stty -F /dev/ttyAMA0 115200
 ExecStart=/root/WiFree/wifree-msp.rb &>/dev/null
 KillSignal=SIGINT
 Restart=on-failure

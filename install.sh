@@ -175,8 +175,8 @@ execute "chroot $DEST apt-get install -y \
   hostapd:armhf dnsmasq:armhf \
   hostapd:armhf iptables:armhf \
   ruby:armhf ruby-serialport:armhf minicom:armhf \
-  python3-picamera:armhf \
-  gstreamer1.0-x:armhf gstreamer1.0-omx:armhf gstreamer1.0-plugins-base:armhf \
+  python-picamera:armhf \
+  gstreamer1.0-x:armhf gstreamer1.0-omx:armhf gstreamer1.0-tools:armhf gstreamer1.0-plugins-base:armhf \
   gstreamer1.0-plugins-good:armhf  gstreamer1.0-plugins-bad:armhf gstreamer1.0-plugins-ugly:armhf"
 execute "chroot $DEST systemctl disable bluetooth.service avahi-daemon.service dhcpcd.service dhcpcd5.service \
   systemd-timesyncd.service rpi-display-backlight.service keyboard-setup.service wifi-country.service \

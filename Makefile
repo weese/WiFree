@@ -23,7 +23,9 @@ all: build-image
 clean:
 	rm images/${IMG}_*.img
 
-docker-build db: docker-build-kernel docker-build-image
+# Disable custom kernel building as we want an old kernel, see above.
+# docker-build db: docker-build-kernel docker-build-image
+docker-build db: docker-build-image
 
 .PHONY: docker-build-kernel
 docker-build-kernel:
