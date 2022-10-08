@@ -46,7 +46,7 @@ if __FILE__==$0
 	
 	require 'serialport'
 	
-	SerialPort.open('COM17', :baud=>9600, :data_bits => 8, :stop_bits => 1, :parity => SerialPort::NONE) do |sp|
+	SerialPort.open('COM17', :baud=>115200, :data_bits => 8, :stop_bits => 1, :parity => SerialPort::NONE) do |sp|
 		warn "sp open"
 		values = {:throttle => 1100, :aileron => 1200, :elevator => 1300, :rudder => 1400, :aux1 => 1500, :aux2 => 1600, :aux3 => 1700, :aux4 => 1800}
 		loop do

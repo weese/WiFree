@@ -41,7 +41,7 @@ $armed = false
 
 Thread.new do
 	begin
-		SerialPort.open('/dev/ttyAMA0', :baud => 9600, :data_bits => 8, :stop_bits => 1, :parity => SerialPort::NONE) do |sp|
+		SerialPort.open('/dev/ttyAMA0', :baud => 115200, :data_bits => 8, :stop_bits => 1, :parity => SerialPort::NONE) do |sp|
 			loop do
 				pkt = gen_msp($values)
 				sp.write(pkt)

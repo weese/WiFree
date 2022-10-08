@@ -178,6 +178,28 @@ execute "chroot $DEST apt-get install -y \
   python3-picamera:armhf \
   gstreamer1.0-x:armhf gstreamer1.0-omx:armhf gstreamer1.0-plugins-base:armhf \
   gstreamer1.0-plugins-good:armhf  gstreamer1.0-plugins-bad:armhf gstreamer1.0-plugins-ugly:armhf"
+execute "chroot $DEST systemctl disable bluetooth.service avahi-daemon.service dhcpcd.service dhcpcd5.service \
+  systemd-timesyncd.service rpi-display-backlight.service keyboard-setup.service wifi-country.service \
+  triggerhappy.service rsync.service hciuart.service dbus-fi.w1.wpa_supplicant1.service console-setup.service \
+  nfs-client.target remote-fs.target apt-daily-upgrade.timer apt-daily.timer triggerhappy.socket"
+
+# Only keep a minimal set of services - speeds up the booting and increases stability
+
+# pi@raspberrypi:~ $ systemctl list-unit-files | grep enabled
+# autovt@.service                        enabled  
+# create_ap.service                      enabled  
+# cron.service                           enabled  
+# dnsmasq.service                        enabled  
+# fake-hwclock.service                   enabled  
+# getty@.service                         enabled  
+# networking.service                     enabled  
+# raspberrypi-net-mods.service           enabled  
+# rsyslog.service                        enabled  
+# ssh.service                            enabled  
+# sshswitch.service                      enabled  
+# syslog.service                         enabled  
+# wifree.service                         enabled  
+
 
 # boot config
 cat << EOF >> $DESTBOOT/config.txt
@@ -185,7 +207,6 @@ start_x=1
 enable_uart=1
 dtoverlay=disable-bt
 dtoverlay=pi3-disable-bt
-dtoverlay=miniuart-bt
 
 hdmi_cvt=1024 600 60 3 0 0 0
 hdmi_group=2
