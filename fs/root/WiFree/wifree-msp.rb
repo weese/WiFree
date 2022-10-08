@@ -56,8 +56,8 @@ end
 
 
 def emergency
-	# $hold = true
-	# $values[:aux2] = 2000
+	$hold = true
+	$values[:aux2] = 2000
 end
 
 def all_clear
@@ -149,10 +149,10 @@ def load_params
 end
 
 def save_params
-	system("mount -o remount,rw /data")
+	# system("mount -o remount,rw /data")
 	File.open($params_file,"w"){|f| f.write($params.to_json)}
 ensure
-	system("mount -o remount,ro /data")
+	# system("mount -o remount,ro /data")
 end
 
 

@@ -5,10 +5,10 @@ def gen_msp(values)
 	sequence = [:throttle, :aileron, :elevator, :rudder, :aux1, :aux2, :aux3, :aux4 ]
 
 	data = sequence.map{|k| values[k]||1500}
-	msp2(200, data)
+	msp_v2(200, data)
 end
 
-def msp(command, data)
+def msp_v1(command, data)
 	crc = 0
 	
 	res = [data.length*2, command] + data.pack("v*").bytes
@@ -30,7 +30,7 @@ def crc8_dvb_s2(crc, a)
 	crc &= 0xff
 end
 
-def msp2(command, data)
+def msp_v2(command, data)
 	res = [0] + ([command, data.length*2] + data).pack("v*").bytes
 
 	ck2 = 0; # initialise CRC

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# We don't use a separate /video partition but the root partition
+exit 0
+
 if [[ ! -b /dev/mmcblk0p3 ]]
 then
 	echo "create partition..."
