@@ -2,7 +2,7 @@
 
 ## The original WiFree Copter image
 
-The [original Raspberry Pi image](https://open-diy-projects.com/topic/raspberry-pi-image-installation-und-verkabelung/) for the WiFree Copter was created by @EagleEi in 2016 and is based on Rasbian 8 Jessie lite.
+The [original Raspberry Pi image](https://open-diy-projects.com/topic/raspberry-pi-image-installation-und-verkabelung/) for the WiFree Copter was created by [@EagleEi](https://github.com/EagleEi) in 2016 and is based on Rasbian 8 Jessie lite.
 It mainly consists of the `create_ap` and `wifree` services. `create_ap` sets up a Wifi network (SSID: WF-xxxxxx, password: 123412341234) and a DHCP server so that your Mobile phone can connect to it.
 `wifree` is an HTTP server that builds the bridge between the WiFree Android app and the Flight Controller (FC).
 To communicate with the FC, the [MSPv1](https://ardupilot.org/copter/docs/common-msp-overview.html) protocol over serial (9600 8n1) is used.
