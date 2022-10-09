@@ -15,7 +15,7 @@ To address this I added a `msp_v2()` function in `msp.rb` that is now used for t
 I also switched to 115200 baud. 
 
 This image is now based on Rasbian 9 Stretch lite. 
-It could easily be based on the most recent Rasbian (Bullseye by the time of writing), but it turned out that for newer Linux kernels 5.x, the drivers for the onboard Wifi show no signal strenghts for the connected clients in AP mode anymore. 
+It could easily be based on the most recent Rasbian (Bullseye by the time of writing), but it turned out that for newer Linux kernels 5.x, the drivers for the onboard Wifi shows no signal strenghts for the connected clients in AP mode anymore. 
 So, I decided to use the last Rasbian that comes with a 4.x kernel - Rasbian 9 Stretch.
 
 What's missing is the the read-only root file system and the 2 separate data and video partitions. Maybe that will come later.
